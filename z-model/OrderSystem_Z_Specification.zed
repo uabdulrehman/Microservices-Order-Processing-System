@@ -1,0 +1,173 @@
+\begin{zed}
+
+[ORDER, CUSTOMER, PRODUCT]
+
+\end{zed}
+
+
+\begin{schema}{OrderSystemState}
+
+orders      : \power ORDER \\
+customers   : \power CUSTOMER \\
+products    : \power PRODUCT \\
+
+paid        : \power ORDER \\
+reserved    : \power ORDER \\
+shipped     : \power ORDER \\
+cancelled   : \power ORDER
+
+\where
+
+paid \subseteq orders \\
+reserved \subseteq orders \\
+shipped \subseteq orders \\
+cancelled \subseteq orders \\
+
+shipped \subseteq paid \\
+shipped \subseteq reserved \\
+
+shipped \cap cancelled = \emptyset
+
+\end{schema}
+
+
+\begin{schema}{InitOrderSystemState}
+
+OrderSystemState
+
+\where
+
+orders = \emptyset \\
+customers = \emptyset \\
+products = \emptyset \\
+
+paid = \emptyset \\
+reserved = \emptyset \\
+shipped = \emptyset \\
+cancelled = \emptyset
+
+\end{schema}
+
+
+\begin{schema}{CreateOrder}
+
+\Delta OrderSystemState \\
+
+o? : ORDER
+
+\where
+
+o? \notin orders \\
+
+orders' = orders \cup \{o?\} \\
+
+customers' = customers \\
+products' = products \\
+
+paid' = paid \\
+reserved' = reserved \\
+shipped' = shipped \\
+cancelled' = cancelled
+
+\end{schema}
+
+
+\begin{schema}{ConfirmPayment}
+
+\Delta OrderSystemState \\
+
+o? : ORDER
+
+\where
+
+o? \in orders \\
+o? \notin paid \\
+o? \notin cancelled \\
+
+paid' = paid \cup \{o?\} \\
+
+orders' = orders \\
+customers' = customers \\
+products' = products \\
+
+reserved' = reserved \\
+shipped' = shipped \\
+cancelled' = cancelled
+
+\end{schema}
+
+
+\begin{schema}{ReserveInventory}
+
+\Delta OrderSystemState \\
+
+o? : ORDER
+
+\where
+
+o? \in paid \\
+o? \notin reserved \\
+o? \notin cancelled \\
+
+reserved' = reserved \cup \{o?\} \\
+
+orders' = orders \\
+customers' = customers \\
+products' = products \\
+
+paid' = paid \\
+shipped' = shipped \\
+cancelled' = cancelled
+
+\end{schema}
+
+
+\begin{schema}{ShipOrder}
+
+\Delta OrderSystemState \\
+
+o? : ORDER
+
+\where
+
+o? \in paid \\
+o? \in reserved \\
+o? \notin shipped \\
+o? \notin cancelled \\
+
+shipped' = shipped \cup \{o?\} \\
+
+orders' = orders \\
+customers' = customers \\
+products' = products \\
+
+paid' = paid \\
+reserved' = reserved \\
+cancelled' = cancelled
+
+\end{schema}
+
+
+\begin{schema}{CancelOrder}
+
+\Delta OrderSystemState \\
+
+o? : ORDER
+
+\where
+
+o? \in orders \\
+o? \notin shipped \\
+o? \notin cancelled \\
+
+cancelled' = cancelled \cup \{o?\} \\
+
+orders' = orders \\
+customers' = customers \\
+products' = products \\
+
+paid' = paid \\
+reserved' = reserved \\
+shipped' = shipped
+
+\end{schema}

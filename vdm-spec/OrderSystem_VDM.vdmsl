@@ -1,0 +1,73 @@
+module OrderSystem
+
+exports all  
+
+definitions
+
+types
+
+ORDER = token;
+Orders = set of ORDER;
+
+state OrderSystem of
+    orders    : Orders
+    paid      : Orders
+    reserved  : Orders
+    shipped   : Orders
+    cancelled : Orders
+inv mk_OrderSystem(o, p, r, s, c) ==
+    p subset o and
+    r subset o and
+    s subset o and
+    c subset o and
+    s subset p and
+    s subset r and
+    p inter c = {} and
+    r inter c = {} and
+    s inter c = {}
+init s == s = mk_OrderSystem({}, {}, {}, {}, {})
+end;
+
+operations
+
+CreateOrder : ORDER ==> ()
+CreateOrder(order) ==
+(
+    orders := orders union {order}
+)
+pre order not in set orders
+post order in set orders;
+
+ConfirmPayment : ORDER ==> ()
+ConfirmPayment(order) ==
+(
+    paid := paid union {order}
+)
+pre order in set orders and order not in set paid
+post order in set paid;
+
+ReserveInventory : ORDER ==> ()
+ReserveInventory(order) ==
+(
+    reserved := reserved union {order}
+)
+pre order in set paid and order not in set reserved
+post order in set reserved;
+
+ShipOrder : ORDER ==> ()
+ShipOrder(order) ==
+(
+    shipped := shipped union {order}
+)
+pre order in set reserved and order in set paid and order not in set shipped
+post order in set shipped;
+
+CancelOrder : ORDER ==> ()
+CancelOrder(order) ==
+(
+    cancelled := cancelled union {order}
+)
+pre order in set orders and order not in set shipped and order not in set paid
+post order in set cancelled;
+
+end OrderSystem
